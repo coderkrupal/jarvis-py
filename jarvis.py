@@ -3,6 +3,8 @@ import speech_recognition as sr
 import pyjokes
 import datetime
 import webbrowser
+import requests
+from geopy.geocoders import Nominatim
 
 
 def speechtext():
@@ -64,6 +66,29 @@ if __name__ == "__main__":
                 speechspeake(joke)
             elif "deactivate" in data1:
                 speechspeake("deacticate")
+    elif jarvis_input == 2:
+        print("weather update...")
+        geolocator = Nominatim(user_agent="weather_app")
+        CITY = input("enter a city name")
+        location = geolocator.geocode("{CITY}, India")
+        if location:
+            lat = location.latitude
+            lon = location.longitude
+        else:
+            print("locatino not found")
+        API_KEY = "f8136e2bab5b48d17abf806cbba601e9"
+        URL = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={API_KEY}"
+        response = requests.get(URL)
+        data = response.json()
+        # print(data)
+        if response.status_code == 200:
+            temp = data["main"]["temp"]
+            weather = data["weather"][0]["description"]
+            speakdata = f"Current temperature in {CITY}: {temp}°C"
+            print("speaking......")
+            speechspeake(speakdata)
+        else:
+            speechspeake("Failed to get weather data")
 
     else:
         print("not recognize")
